@@ -3,18 +3,21 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 app.get('/app', function(req, res){
-    res.sendFile('C:/Users/hosni/Desktop/node js revision/index.html');});
+    res.sendFile('C:/Users/hosni/Desktop/socketIO_practice/index.html');});
+
 users = [];
 counter = 0;
 
 io.on('connection', function(socket){
-   console.log('A user connected');
-    counter = 0;
-
+    
+    console.log('A user connected');
     setInterval(function() {
-        socket.emit('test_topic', 'it is' + counter );
-        counter++;
-    }, 5);
+        const birthday = new Date();
+        var date = birthday.getHours() + ' : ' + birthday.getMinutes() + ' : '+ birthday.getSeconds(); 
+
+        socket.emit('time_topic', 'Current Time : ' + date);
+
+    }, 1000);
 
    socket.on('setUsername', function(data){   
       console.log(data);
@@ -27,15 +30,14 @@ io.on('connection', function(socket){
    });
 
    socket.on('msg', function(data){
-      //Send message to everyone
+      // Broadcasting message to other clients
       io.sockets.emit('newmsg', data);
    });
 
    socket.on('disconnect', function()
    {
-       counter = 0;
-   }
-   );
+        console.log('A user disconnected');
+   });
 });
 http.listen(3000, function(){
    console.log('listening on localhost:3000');
